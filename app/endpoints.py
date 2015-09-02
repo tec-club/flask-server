@@ -8,9 +8,11 @@ auth = HTTPBasicAuth()
 #authenticate by retreiving a password
 @auth.get_password
 def get_password(email):
-	if email == 'test@gmail.com':
-		return 'password'
-	return none
+	user = User.query.filter_by(email='student11').first()
+
+	if user:
+		return user.password
+	return None
 
 
 @auth.error_handler
@@ -20,6 +22,7 @@ def unauthorized():
 
 @app.route('/')
 @app.route('/index')
+@auth.login_required
 def index():
 	user = User.query.filter_by(email='student11').first()
 	print(user)
