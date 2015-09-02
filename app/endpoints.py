@@ -1,6 +1,7 @@
 from flask.ext.httpauth import HTTPBasicAuth
 from flask import *
 from app import app
+from app import User #test
 auth = HTTPBasicAuth()
 
 
@@ -20,6 +21,8 @@ def unauthorized():
 @app.route('/')
 @app.route('/index')
 def index():
+	user = User.query.filter_by(email='student11').first()
+	print(user)
 	return "Hello, world!"
 
 
