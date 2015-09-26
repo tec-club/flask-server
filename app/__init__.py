@@ -1,7 +1,8 @@
 import os
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask import Flask
-
+from flask import jsonify
+import json
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -23,7 +24,16 @@ class User(db.Model):
 	def __repr__(self):
 		return '<User %s>' % self.email
 
-	
+class Event():
+	title=""
+	date=""
+
+	def __init__(self, title, date):
+		self.date = date
+		self.title = title
+
+	def to_Dic(self):
+		return {'title':str(self.title)[1:len(str(self.title))-1], 'date':self.date}
 
 from app import endpoints
 
