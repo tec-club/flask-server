@@ -1,4 +1,6 @@
 from app import db
+from sqlalchemy import ForeignKey
+from sqlalchemy import relationship, backref
 
 class User(db.Model):
 	__table_args__ = {'extend_existing': True}
@@ -20,6 +22,7 @@ class SchoolloopClass(db.Model):
 	teacher=db.Column(db.String(80))
 	grade=db.Column(db.Float(1000, True)) #Not 100% sure on precision (1st) parameter
 	period=db.Column(db.Integer)
+	user_id=Column(db.Integer, "users.id")
 
 	#Creates many to one link between schoolloopclass and User
 	user=relationship("User", backref=backref("classes", order_by=id))
@@ -34,6 +37,7 @@ class SchoolloopAssignment(db.Model):
 	id=db.Column(db.Integer, primary_key=True)
 	title=db.Column(db.String(120))
 	score=db.Column(db.String(10))  #Scores stored in strings to preserve weighting.i.e 70/100vs7/10
+	schoolloopclass_id=db.Column(db.Integer, "schoolloopclass.id")
 	#creates relationship between SchoolloopClass and SchoolloopAssignment
 	schoolloopclass=relationship("SchoolloopClass", backref=backref("assignments", order_by=id))
 
