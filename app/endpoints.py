@@ -166,6 +166,51 @@ def getNextday():
 
 	return ""
 
+#This method does not quite work!!!!
+#TODO-find solution to transferring cookies to BeautifulSoup
+#so that we can parse pages that require authentications
+@app.route('/api/schoolloop/assignments/', methods=['POST'])
+def getNewAssignments():
+    username = request.values.get("username")
+    password = request.values.get("password")
+    user=User(username, password)
+    if signIn():
+        baseURL = "https://cdm.schoolloop.com/portal/student_home"
+        page = requests.get(baseURL)
+        soup = BeautifulSoup(page.content)
+        results = soup.findAll("div", class_="content")  # Content classes include class list, assignment list,and
+        # calendar list, entries.length should ==3
+        contents = results.findAll("div", class_="ajax_accordion")
+
+        for items in contents:
+            if items.find('table'):
+                if items.find('table').has_key('class'):
+                    if items.find('table')[
+                        'class'][0] == "student_row":  # this content div contains the grades, teacher, classes list
+                    # adds class to users
+                        user.classes.append(parseClass(user, items.find('table')))    #creates assignemt
+                    elif items.find('table')['class'][0] == 'table_basic':
+                      # To parse assignments and add it to the corresponding class-not yet implemented
+                            parseAssignment(user, items.find('table'))
+
+        else:
+            return jsonify(error="Invalid Credentials")
+
+#Issues with parsing dyanmically generated js output with BeautifulSoup so far
+def parseAssignment(user, table):
+	pass
+
+
+def parseClass(user, table) :
+    course=table.find('td', class_='course').string
+    period=table.find('td', class_='period').string
+    letterGrade=table.find('div', class_='float_l grade').string
+    gradePercent=table.find('div', class_='float_l percent').string
+    teacherName=table.find('td', class_="teacher co-teacher").string
+    #Should create add a schoolloop class to the user class list
+    #TODO implement data structure with User containing a list of classes/assignments to verify
+    #with a cache
+    return SchoolLoopClass(course, teacherName, gradePercent, period)
 
 
 
